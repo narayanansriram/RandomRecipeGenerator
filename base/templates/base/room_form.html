@@ -1,0 +1,18 @@
+{% extends 'main.html' %} {% block content %}
+
+<div>
+  <form method="POST" action="">
+    {% csrf_token %}
+    <strong>Instructions</strong>
+    <p>
+      Fill out the (optional) cuisine type, name of your recipe, and input your
+      recipe
+    </p>
+
+    <p></p>
+    <hr />
+    {{form.as_p}}
+    <input type="Submit" value="Submit" />
+  </form>
+</div>
+{% endblock content%}

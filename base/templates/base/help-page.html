@@ -1,0 +1,24 @@
+{%extends 'main.html'%} {%block content%}
+<section class="p-5">
+  <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md">
+        <h2 class="text-center mb-4">Help Page</h2>
+        <ul class="list-group list-group-flush lead">
+          <li class="list-group-item">
+            <span class="fw-bold">Don't like the random recipe you got?:</span>
+            Click the 'Didn't Like it? Generate Another Recipe' Button
+          </li>
+          <li class="list-group-item">
+            <span class="fw-bold">Unhappy with your recipe?:</span> Reach out to
+            us through the
+            <a href="{%url 'contact-us'%}">Contact Us</a>
+            page and let us know!
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{%endblock content%}

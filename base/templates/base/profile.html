@@ -1,0 +1,31 @@
+{% extends 'main.html' %} {% block content%}
+<section class="bg-light text-dark p-5 text-left">
+  <div class="container">
+    <!-- <a href="{% url 'create-room' %}">Generate Random Recipe</a> -->
+    <hr />
+    <form method="POST" action="">
+      {% csrf_token %}
+      <input type="Submit" value="Generate Random Recipe" />
+      <hr />
+      <h3>{{user.username}}'s List of Recipes</h3>
+      <a href="{% url 'create-room'%}">Create My Own Recipe</a>
+      <hr />
+    </form>
+    {% for room in rooms %}
+    <div>
+      {% if request.user == room.host %}
+      <!-- <span>@{{room.host.username}}</span> -->
+      <h5>
+        <!-- {{room.id}} : -->
+        <a href="{% url 'room' room.id %}">{{room.name}}</a>
+      </h5>
+      <small>{{room.cuisine.name}}</small>
+      <a href="{% url 'update-room' room.id%}">Edit</a>-
+      <a href="{% url 'delete-room' room.id%}">Delete</a>
+      <hr />
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{%endblock content%}

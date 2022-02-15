@@ -1,0 +1,23 @@
+{%extends 'main.html'%} {%block content%}
+<section class="p-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md">
+        <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
+        <h2 class="text-center mb-4">Contact Information</h2>
+        <ul class="list-group list-group-flush lead">
+          <li class="list-group-item">
+            <span class="fw-bold">Main Location:</span> 50 Main St Hartford CT
+          </li>
+          <li class="list-group-item">
+            <span class="fw-bold">Phone:</span> 1-800-786-1543
+          </li>
+          <li class="list-group-item">
+            <span class="fw-bold">Email:</span> contact@recipea.ce
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+{%endblock content%}
