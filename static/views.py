@@ -12,7 +12,6 @@ import random
 import json
 import requests
 import os
-import time
 
 #TODO
 # Add more styling, flexbox and bootstrap
@@ -97,25 +96,28 @@ def userProfile(request,pk):
         input_data["minCalories"] = 100
         input_data["cuisine"] = data_pool["cuisine"][rand]
         print(input_data["cuisine"])
-        time.sleep(5)
         input_data["diets"] = data_pool["diets"][rand%len(data_pool["diets"])]
-        #Write input to JSON
         jsonWrite = open(f"static//microservice//recipe_input.json","w")
         jsonWrite.write(json.dumps(input_data))
         jsonWrite.close()
-        #Call microservice
         os.system('python3 static//microservice//RecipeService.py')
         with open(f'static//microservice//recipe.json') as f:
             data = json.load(f)
         print('json data->',data.keys())
         print('json recipe->',data['image'])
+        rand = random.randint(1,5)
+        # json_recipe_txt = json.dumps(data)
         image_file = f'temp.{data["imageType"]}'
         r = requests.get(data['image'])
         print('image type--->',data['imageType'])
         with open(f'static//{image_file}', 'wb') as img:
             print(img)
-            img.write(r.content)  
-        #Publis to front end
+            img.write(r.content)    
+        with open(f'static//{rand}.txt') as f:
+            recipe_txt = f.readlines()
+        pic_path = str(rand)+'.png'
+        # rooms = Room.objects.create()s
+        # context = {"submitbutton":submitbutton, "recipe":recipe_txt, "pic_path":pic_path}
         context = {"submitbutton":submitbutton, "title":data['title'],"recipe":data['instructions'], "pic_path":image_file}
         return render(request,'base/recipe.html',context)
     context = {'user':user,'rooms':rooms,'form':form, 'pk':pk} 
