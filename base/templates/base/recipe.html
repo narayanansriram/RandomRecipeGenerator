@@ -1,3 +1,4 @@
+<!-- Recipe template with requesting another recipe -->
 {%extends 'main.html'%} {%block content%} {% load static %}
 
 <div class="container">
@@ -5,9 +6,6 @@
   <h1>{{title}}</h1>
 </div>
 <img src="{%static pic_path%}" width="480" height="360" />
-<!-- {% for x in recipe %}
-<p>{{x}}</p>
-{% endfor %} -->
 <p>{% autoescape off %}{{recipe}}{% endautoescape %}</p>
 <div class="container">
   <form method="POST" action="">

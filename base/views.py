@@ -1,3 +1,6 @@
+
+# This file contains the business logic for the application
+# Curator: Sriram Narayanan
 from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -6,23 +9,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login, logout
 from django.contrib.auth.forms import UserCreationForm
-from .models import Room
-from .forms import RoomForm
+from .models import Recipe
+from .forms import RecipeForm
 import random
 import json
 import requests
 import os
 import time
 
-#TODO
-# Add more styling, flexbox and bootstrap
-# Create your views here.
-# rooms = [
-#     {'id':1, 'name':'Indian'},
-#     {'id':2, 'name':'Chinese'},
-#     {'id':3, 'name':'Vietnamese'},
-# ]
 
+# Function for logging in a user (accessed via POST)
 def loginPage(request):
     page = 'login'
     if request.user.is_authenticated:
@@ -30,7 +26,6 @@ def loginPage(request):
     if request.method =="POST":
         username = request.POST.get('username').lower()
         password = request.POST.get('password')
-
         try:
             user = User.objects.get(username=username)
         except:
@@ -44,10 +39,12 @@ def loginPage(request):
     context = {'page':page}
     return render(request, 'base/login_register.html', context)
 
+# Function for logging out a user
 def logoutUser(request):
     logout(request)
     return redirect('home')
 
+# Function for registering first time user via POST request
 def registerUser(request):
     page='register'
     form = UserCreationForm()
@@ -63,104 +60,105 @@ def registerUser(request):
             messages.error(request, 'An error occured during registration')
     return render(request,'base/login_register.html',{'form':form})
 
+# Home page route - renders the home page template
 def home(request):
-    # return HttpResponse('Home page')
-    rooms = Room.objects.all()
-    context = {'rooms':rooms}
+    recipe = Recipe.objects.all()
+    context = {'recipes':recipe}
     return render(request, 'base/home.html', context)
 
-def room(request, pk):
-    # return HttpResponse('Room')
-    room = Room.objects.get(id=pk)
-    messages = room.message_set.all()
-    context = {'room':room}
-    return render(request, 'base/room.html',context)
+# Displays all recipes
+def recipe(request, pk):
+    recipe = Recipe.objects.get(id=pk)
+    messages = recipe.message_set.all()
+    context = {'recipe':recipe}
+    return render(request, 'base/recipe-entry.html',context)
 
+# Contact us Page Generator
 def contactUs(request):
     return render(request,'base/contact-us.html')
 
+# Help Page Generator
 def helpPage(request):
     return render(request,'base/help-page.html')
 
-def userProfile(request,pk):
+# Recipe Generator which calls the microservices
+def recipeGenerator(request,pk):
     user = User.objects.get(id=pk)
-    rooms = Room.objects.all()
+    recipes = Recipe.objects.all()
     form = UserCreationForm()
     if request.method == 'POST':
+        # Trigger the submit button
         submitbutton = request.POST.get('submit')
         data = None
+        # Assemble input for microservice
         input_data = {}
         rand = random.randint(0,12)
-        data_pool = {"cuisine":["nordic","spanish","cajun","indian","thai","mediterranean","mexican","japanese","lebanese","american","vietnamese", "french"],
+        data_pool = {"cuisine":["nordic","spanish","cajun","indian","thai","mediterranean","mexican","japanese","lebanese","vietnamese", "french"],
         "diets":["vegan","paleo","whole","gluten free"]}
         input_data["maxCalories"] = 100*rand
         input_data["minCalories"] = 100
-        input_data["cuisine"] = data_pool["cuisine"][rand]
+        input_data["cuisine"] = data_pool["cuisine"][rand%10]
         print(input_data["cuisine"])
-        time.sleep(5)
+        time.sleep(2)
         input_data["diets"] = data_pool["diets"][rand%len(data_pool["diets"])]
         #Write input to JSON
         jsonWrite = open(f"static//microservice//recipe_input.json","w")
         jsonWrite.write(json.dumps(input_data))
+        #close JSON
         jsonWrite.close()
         #Call microservice
         os.system('python3 static//microservice//RecipeService.py')
         with open(f'static//microservice//recipe.json') as f:
             data = json.load(f)
-        print('json data->',data.keys())
-        print('json recipe->',data['image'])
         image_file = f'temp.{data["imageType"]}'
         r = requests.get(data['image'])
-        print('image type--->',data['imageType'])
         with open(f'static//{image_file}', 'wb') as img:
             print(img)
             img.write(r.content)  
-        #Publis to front end
+        #Publish to front end
         context = {"submitbutton":submitbutton, "title":data['title'],"recipe":data['instructions'], "pic_path":image_file}
         return render(request,'base/recipe.html',context)
-    context = {'user':user,'rooms':rooms,'form':form, 'pk':pk} 
+    context = {'user':user,'recipes':recipes,'form':form, 'pk':pk} 
     return render(request, 'base/profile.html', context)
 
 @login_required(login_url='login')
 def likeRecipe(request,recipe):
-    print("recipe-->",recipe)
+    return "logged in"
 
 @login_required(login_url='login')
-def createRoom(request):
-    form = RoomForm()
+def createRecipe(request):
+    form = RecipeForm()
     if request.method=='POST':
-        form = RoomForm(request.POST)
+        form = RecipeForm(request.POST)
         if form.is_valid():
-            room = form.save(commit=False)
-            room.host = request.user
-            room.save()
+            recipe = form.save(commit=False)
+            recipe.host = request.user
+            recipe.save()
             return redirect('home')
-        # request.POST.get('name') --> get the name
-        # print(request.POST) #All the data
     context = {'form':form}
-    return render(request,'base/room_form.html', context)
+    return render(request,'base/recipe_form.html', context)
 
 @login_required(login_url='login')
-def updateRoom(request, pk):
-    room = Room.objects.get(id=pk)
-    form  = RoomForm(instance=room)
+def updateRecipe(request, pk):
+    recipe = Recipe.objects.get(id=pk)
+    form  = RecipeForm(instance=recipe)
 
-    if request.user != room.host:
+    if request.user != recipe.host:
         return HttpResponse('Restricted action')
     if request.method == 'POST':
-        form = RoomForm(request.POST, instance=room)
+        form = RecipeForm(request.POST, instance=recipe)
         if form.is_valid():
             form.save()
             return redirect('home')
     context = {'form': form}
-    return render(request, 'base/room_form.html', context)
+    return render(request, 'base/recipe_form.html', context)
 
 @login_required(login_url='login')
-def deleteRoom(request,pk):
-    room = Room.objects.get(id=pk)
-    if request.user != room.host:
+def deleteRecipe(request,pk):
+    recipe = Recipe.objects.get(id=pk)
+    if request.user != recipe.host:
         return HttpResponse('Restricted action')
     if request.method == "POST":
-        room.delete()
+        recipe.delete()
         return redirect('home')
-    return render(request, 'base/delete.html', {'obj':room})
+    return render(request, 'base/delete.html', {'obj':recipe})

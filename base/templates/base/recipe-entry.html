@@ -1,0 +1,7 @@
+<!-- Recipe template -->
+{%extends 'main.html'%} {%block content%}<a href="{{request.META.HTTP_REFERER}}"
+  >Go Back</a
+>
+<h1>{{recipe.name}}</h1>
+<p>{{recipe.description}}</p>
+{%endblock content%}

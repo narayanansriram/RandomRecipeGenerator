@@ -12,7 +12,9 @@
         <a href="'#" class="nav-link disabled">Welcome {{request.user}}!</a>
       </li>
       <li class="nav-item active">
-        <a href="{%url 'user-profile' request.user.id%}" class="nav-link active"
+        <a
+          href="{%url 'recipe-generator' request.user.id%}"
+          class="nav-link active"
           >{{request.user}}'s Profile</a
         >
       </li>

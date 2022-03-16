@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
-from .models import Room, Cuisine, Message
+# Models for the application are registered here
+from .models import Recipe, Cuisine, Message
 
-admin.site.register(Room)
+admin.site.register(Recipe)
 admin.site.register(Cuisine)
 admin.site.register(Message)

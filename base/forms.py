@@ -1,8 +1,9 @@
 from django.forms import ModelForm
-from .models import Room
+from .models import Recipe
 
-class RoomForm(ModelForm):
+#Form for recipes input
+class RecipeForm(ModelForm):
     class Meta:
-        model = Room
+        model = Recipe
         fields = '__all__'
         exclude = ['host']
