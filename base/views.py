@@ -121,10 +121,12 @@ def recipeGenerator(request,pk):
     context = {'user':user,'recipes':recipes,'form':form, 'pk':pk} 
     return render(request, 'base/profile.html', context)
 
+# Function for liking a recipe
 @login_required(login_url='login')
 def likeRecipe(request,recipe):
     return "logged in"
 
+# Function for creating a recipe
 @login_required(login_url='login')
 def createRecipe(request):
     form = RecipeForm()
@@ -138,11 +140,12 @@ def createRecipe(request):
     context = {'form':form}
     return render(request,'base/recipe_form.html', context)
 
+# Function for updating a recipe
 @login_required(login_url='login')
 def updateRecipe(request, pk):
     recipe = Recipe.objects.get(id=pk)
     form  = RecipeForm(instance=recipe)
-
+    #Form created only if the user is valid
     if request.user != recipe.host:
         return HttpResponse('Restricted action')
     if request.method == 'POST':
@@ -153,6 +156,7 @@ def updateRecipe(request, pk):
     context = {'form': form}
     return render(request, 'base/recipe_form.html', context)
 
+#Function for deleting a recipe
 @login_required(login_url='login')
 def deleteRecipe(request,pk):
     recipe = Recipe.objects.get(id=pk)
