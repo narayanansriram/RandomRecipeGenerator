@@ -157,6 +157,7 @@ def updateRecipe(request, pk):
     return render(request, 'base/recipe_form.html', context)
 
 #Function for deleting a recipe
+# Login is required
 @login_required(login_url='login')
 def deleteRecipe(request,pk):
     recipe = Recipe.objects.get(id=pk)
